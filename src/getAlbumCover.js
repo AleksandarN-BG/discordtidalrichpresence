@@ -37,7 +37,7 @@ export async function getAlbumCover(uuid) {
 
         const attachment = new MessageAttachment(imagePath);
 
-        const message = await client.channels.cache.get('1294705928196591658').send({files: [attachment]});
+        const message = await client.channels.cache.get(fs.readFileSync('channel_id.txt', 'utf8')).send({files: [attachment]});
 
         console.log(`Image uploaded: ${message.attachments.first().url}`);
         uploadedImages.set(parseduuid, message.attachments.first().url);
