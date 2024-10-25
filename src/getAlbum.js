@@ -1,8 +1,8 @@
-import {client} from "../main.js";
+import {client, country_code} from "../main.js";
 
 export async function getAlbum(query) {
     let encodedQuery = encodeURIComponent(query);
-    let endpoint = `https://api.tidal.com/v1/search/tracks?countryCode=RS&query=${encodedQuery}&limit=1`;
+    let endpoint = `https://api.tidal.com/v1/search/tracks?countryCode=${country_code}&query=${encodedQuery}&limit=1`;
     const request = await fetch(endpoint, {
         method: "GET",
         headers: {"x-tidal-token": "CzET4vdadNUFQ5JU"}

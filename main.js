@@ -8,6 +8,7 @@ import user_config from './config.json' with {type: "json"};
 export const client = new Client();
 export const token = user_config.token;
 export const channel_id = user_config.channel_id;
+export const country_code = user_config.country_code;
 
 let song = "";
 let albumData;
