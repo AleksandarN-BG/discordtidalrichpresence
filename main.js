@@ -2,7 +2,7 @@ import {Client} from "discord.js-selfbot-v13";
 import {fetchWindowTitleAndAlbum} from "./src/fetchWindowTitleAndAlbum.js";
 import {getAlbum} from "./src/getAlbum.js";
 import {getAlbumCover} from "./src/getAlbumCover.js";
-import {updaterichpresence} from "./src/updaterichpresence.js";
+import {updateRichPresence} from "./src/updateRichPresence.js";
 import user_config from './config.json' with {type: "json"};
 
 export const client = new Client();
@@ -24,7 +24,7 @@ client.on('ready', async () => {
         if (song !== null) {
             albumData = await (getAlbum(song));
             coverurl = await getAlbumCover(albumData.coveruuid);
-            updaterichpresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl);
+            updateRichPresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl);
             activityCleared = false;
         }
         else if (!activityCleared) {
@@ -37,7 +37,7 @@ client.on('ready', async () => {
 
 
 process.on('SIGINT', function () {
-    client.user.setActivity(null)
-    console.log("Received exit signal, clearing RPC and exiting...")
+    client.user.setActivity(null);
+    console.log("Received exit signal, clearing RPC and exiting...");
     process.exit();
 })

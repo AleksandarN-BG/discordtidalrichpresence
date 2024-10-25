@@ -3,7 +3,7 @@ import {client} from "../main.js";
 
 export let rpcdata;
 
-export function updaterichpresence(song, artist, album, url, cover) {
+export function updateRichPresence(song, artist, album, url, cover) {
     if (!client.user) {
         console.error('Client user is not ready.');
         return;
