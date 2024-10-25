@@ -3,15 +3,17 @@ import {fetchWindowTitleAndAlbum} from "./src/fetchWindowTitleAndAlbum.js";
 import {getAlbum} from "./src/getAlbum.js";
 import {getAlbumCover} from "./src/getAlbumCover.js";
 import {updaterichpresence} from "./src/updaterichpresence.js";
-import fs from "fs";
+import user_config from './config.json' with {type: "json"};
 
-const token = fs.readFileSync('./token.txt', 'utf8');
 export const client = new Client();
+export const token = user_config.token;
+export const channel_id = user_config.channel_id;
 
 let song = "";
 let albumData;
 let coverurl;
 let activityCleared = true;
+
 
 client.login(token).then(()=> console.log("Logged in!"));
 

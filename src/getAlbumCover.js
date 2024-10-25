@@ -2,7 +2,7 @@ import path from "path";
 import axios from "axios";
 import fs from "fs";
 import {MessageAttachment} from "discord.js-selfbot-v13";
-import {client} from "../main.js";
+import {client, channel_id} from "../main.js";
 import {fileURLToPath} from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -37,7 +37,7 @@ export async function getAlbumCover(uuid) {
 
         const attachment = new MessageAttachment(imagePath);
 
-        const message = await client.channels.cache.get(fs.readFileSync('channel_id.txt', 'utf8')).send({files: [attachment]});
+        const message = await client.channels.cache.get(channel_id).send({files: [attachment]});
 
         console.log(`Image uploaded: ${message.attachments.first().url}`);
         uploadedImages.set(parseduuid, message.attachments.first().url);
