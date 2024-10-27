@@ -14,6 +14,7 @@ let song = "";
 let albumData;
 let coverurl;
 let activityCleared = true;
+let tempsong = "";
 
 
 client.login(token).then(()=> console.log("Logged in!"));
@@ -25,8 +26,11 @@ client.on('ready', async () => {
         if (song !== null) {
             albumData = await (getAlbum(song));
             coverurl = await getAlbumCover(albumData.coveruuid);
-            updateRichPresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl);
-            activityCleared = false;
+            if (tempsong !== song) {
+                updateRichPresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl);
+                tempsong = song;
+                activityCleared = false;
+            }
         }
         else if (!activityCleared) {
             client.user.setActivity(null);
