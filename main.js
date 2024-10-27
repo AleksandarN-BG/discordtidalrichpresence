@@ -37,6 +37,9 @@ client.on('ready', async () => {
             tempsong = "";
             activityCleared = true;
         }
+        else {
+            console.log("Song hasn't changed and RPC is set. Not doing anything.");
+        }
     }, 5000);
 })
 
