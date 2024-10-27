@@ -35,6 +35,7 @@ client.on('ready', async () => {
         else if (!activityCleared) {
             client.user.setActivity(null);
             console.log("Cleared RPC.");
+            tempsong = "";
             activityCleared = true;
         }
     }, 5000);
