@@ -29,4 +29,3 @@ macOS and Linux support is _not_ guaranteed, but it should work on those platfor
 # License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-```
