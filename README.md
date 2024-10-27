@@ -19,7 +19,7 @@ macOS and Linux support is _not_ guaranteed, but it should work on those platfor
 ```git clone https://github.com/AleksandarN-BG/PublicDiscordTidalRPC.git```
 2. Install the required packages:
 ```npm install```
-3. Edit the `config.json` file and put your Discord token in the `token` field and a channel ID _(make sure you have Developer Mode turned on and then right-click the channel)_ in the `channel_id` field; preferably a private channel.
+3. Edit the `config.json` file and put your Discord token in the `token` field, channel ID - preferably an empty channel in your own private server _(make sure you have Developer Mode turned on and then right-click the channel)_ in the `channel_id` field and **two-letter** country code in the `country_code` field.
 
 # Usage
 
