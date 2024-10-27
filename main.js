@@ -23,16 +23,15 @@ client.on('ready', async () => {
     console.log(`${client.user.username} is ready!`)
     setInterval(async () => {
         fetchWindowTitleAndAlbum((result) => {song = result;});
-        if (song !== null) {
-            albumData = await (getAlbum(song));
-            coverurl = await getAlbumCover(albumData.coveruuid);
-            if (tempsong !== song) {
+        if (song !== null && tempsong !== song) {
+                console.log("Song changed and/or RPC isn't set! Fetching album data...");
+                albumData = await (getAlbum(song));
+                coverurl = await getAlbumCover(albumData.coveruuid);
                 updateRichPresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl);
                 tempsong = song;
                 activityCleared = false;
-            }
         }
-        else if (!activityCleared) {
+        if (!activityCleared && song === null) {
             client.user.setActivity(null);
             console.log("Cleared RPC.");
             tempsong = "";
