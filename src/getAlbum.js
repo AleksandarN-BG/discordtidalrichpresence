@@ -17,8 +17,14 @@ export async function getAlbum(query) {
             let artist = response.items[0].artist.name;
             let album = response.items[0].album.title;
             let songurl = response.items[0].url;
-            let coveruuid = response.items[0].album.cover;
-            return{title, artist, album, songurl, coveruuid};
+            let coveruuid;
+            let videocoveruuid;
+            if (!response.items[0].album.videoCover) {
+                coveruuid = response.items[0].album.cover;
+            } else {
+                videocoveruuid = response.items[0].album.videoCover;
+            }
+            return{title, artist, album, songurl, coveruuid, videocoveruuid};
         } else {
             console.log("No track found, setting RPC to null...");
             client.user.setActivity(null);

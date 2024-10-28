@@ -26,10 +26,15 @@ client.on('ready', async () => {
         if (song !== null && tempsong !== song) {
                 console.log("Song changed and/or RPC isn't set! Fetching album data...");
                 albumData = await (getAlbum(song));
-                coverurl = await getAlbumCover(albumData.coveruuid);
+                coverurl = await (getAlbumCover(albumData.coveruuid, albumData.videocoveruuid));
+                if (coverurl !== undefined) {
                 updateRichPresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl);
                 tempsong = song;
                 activityCleared = false;
+                }
+                else {
+                    console.log("Image not uploaded yet, skipping...");
+                }
         }
         if (!activityCleared && song === null) {
             client.user.setActivity(null);
@@ -38,7 +43,7 @@ client.on('ready', async () => {
             activityCleared = true;
         }
         else {
-            console.log("Song hasn't changed and RPC is up-to-date. Not doing anything.");
+            console.log("Not doing anything.");
         }
     }, 5000);
 })
