@@ -1,5 +1,5 @@
 import {Client} from "discord.js-selfbot-v13";
-import {fetchWindowTitleAndAlbum} from "./src/fetchWindowTitleAndAlbum.js";
+import {fetchWindowTitle} from "./src/fetchWindowTitle.js";
 import {getAlbum} from "./src/getAlbum.js";
 import {getAlbumCover} from "./src/getAlbumCover.js";
 import {updateRichPresence} from "./src/updateRichPresence.js";
@@ -22,7 +22,7 @@ client.login(token).then(()=> console.log("Logged in!"));
 client.on('ready', async () => {
     console.log(`${client.user.username} is ready!`)
     setInterval(async () => {
-        fetchWindowTitleAndAlbum((result) => {song = result;});
+        fetchWindowTitle((result) => {song = result;});
         if (song !== null && tempsong !== song) {
                 console.log("Song changed and/or RPC isn't set! Fetching album data...");
                 albumData = await (getAlbum(song));
@@ -38,7 +38,7 @@ client.on('ready', async () => {
             activityCleared = true;
         }
         else {
-            console.log("Song hasn't changed and RPC is set. Not doing anything.");
+            console.log("Song hasn't changed and RPC is up-to-date. Not doing anything.");
         }
     }, 5000);
 })
