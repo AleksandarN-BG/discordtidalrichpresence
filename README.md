@@ -1,8 +1,8 @@
 # Discord Rich Presence for TIDAL
-This is a simple program that allows you to show what you're listening to on TIDAL on Discord.
+This is a simple program that allows you to show what you're listening to on TIDAL on Discord, **with** support for animated covers.
 
-<img src="screenshot.png" alt="Screenshot of Discord profile">
-<br />
+![animatedcover](https://github.com/user-attachments/assets/c985ec5c-fcf4-45f6-b89e-8f95423a6d76)
+
 <br />
 <img src="mobilescreenshot.png" alt="Screenshot of Discord profile on mobile">
 
