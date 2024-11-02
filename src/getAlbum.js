@@ -2,7 +2,7 @@ import {client, country_code} from "../main.js";
 
 export async function getAlbum(query) {
     let encodedQuery = encodeURIComponent(query);
-    let endpoint = `https://api.tidal.com/v1/search/tracks?countryCode=${country_code}&query=${encodedQuery}&limit=1`;
+    let endpoint = `https://api.tidal.com/v1/search/tracks?countryCode=${country_code}&query=${encodedQuery}&limit=10`;
     const request = await fetch(endpoint, {
         method: "GET",
         headers: {"x-tidal-token": "CzET4vdadNUFQ5JU"}
@@ -10,19 +10,30 @@ export async function getAlbum(query) {
 
     try {
         const response = await request.json();
-        console.log("Got", response.items[0].title, "from album:", response.items[0].album.title);
+        let maxpop = 0;
+        let maxpopindex = 0;
+
+        // Find the most popular track. This helps us avoid getting compilations from random live concerts and whatnot.
+        for (let i = 0; i < response.items.length; i++) {
+            if (response.items[i].popularity > maxpop) {
+                maxpop = response.items[i].popularity;
+                maxpopindex = i;
+            }
+        }
+
+        console.log("Got", response.items[maxpopindex].title, "from album:", response.items[maxpopindex].album.title);
 
         if (response.items && response.items.length > 0 && response.items[0].album) {
-            let title = response.items[0].title;
-            let artist = response.items[0].artist.name;
-            let album = response.items[0].album.title;
-            let songurl = response.items[0].url;
+            let title = response.items[maxpopindex].title;
+            let artist = response.items[maxpopindex].artist.name;
+            let album = response.items[maxpopindex].album.title;
+            let songurl = response.items[maxpopindex].url;
             let coveruuid;
             let videocoveruuid;
-            if (!response.items[0].album.videoCover) {
-                coveruuid = response.items[0].album.cover;
+            if (!response.items[maxpopindex].album.videoCover) {
+                coveruuid = response.items[maxpopindex].album.cover;
             } else {
-                videocoveruuid = response.items[0].album.videoCover;
+                videocoveruuid = response.items[maxpopindex].album.videoCover;
             }
             return{title, artist, album, songurl, coveruuid, videocoveruuid};
         } else {
