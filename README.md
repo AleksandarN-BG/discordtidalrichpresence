@@ -1,14 +1,14 @@
 # Discord Rich Presence for TIDAL
-This is a simple program that allows you to show what you're listening to on TIDAL on Discord.
+This is a simple program that allows you to show what you're listening to on TIDAL on Discord, **with** support for animated covers.
 
-<img src="screenshot.png" alt="Screenshot of Discord profile">
-<br />
+![animatedcover](https://github.com/user-attachments/assets/c985ec5c-fcf4-45f6-b89e-8f95423a6d76)
+
 <br />
 <img src="mobilescreenshot.png" alt="Screenshot of Discord profile on mobile">
 
 This implementation uses .NET code via the [edge.js](https://www.npmjs.com/package/edge-js) library to scrape the main window title, which it then uses to call the TIDAL API and get basic info about your song, as well as the album cover. <br />
 
-macOS and Linux support is _not_ guaranteed, but it should work on those platforms as well, provided that the TIDAL main window behaves the same as the Windows client.
+This app was designed with Windows in mind. If you want a similar experience on Linux, please check out the fantastic [Tidal Hi-Fi](https://github.com/Mastermindzh/tidal-hifi) project, which has excellent built-in Discord RPC support.
 
 # WARNING! ⚠️
 ## <ins>This program uses the selfbot version of the discord.js library. This is against Discord's TOS and can get you banned. Use at your own risk.</ins>
