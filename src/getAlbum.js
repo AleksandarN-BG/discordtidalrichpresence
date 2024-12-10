@@ -25,7 +25,9 @@ export async function getAlbum(query) {
 
         if (response.items && response.items.length > 0 && response.items[0].album) {
             let title = response.items[maxpopindex].title;
-            let artist = response.items[maxpopindex].artist.name;
+            let artist = response.items[maxpopindex].artists.length > 1
+                ? response.items[maxpopindex].artists.map(artist => artist.name).join(", ")
+                : response.items[maxpopindex].artists[0].name;
             let album = response.items[maxpopindex].album.title;
             let songurl = response.items[maxpopindex].url;
             let coveruuid;
