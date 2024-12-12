@@ -24,7 +24,11 @@ export async function getAlbum(query) {
         console.log("Got", response.items[maxpopindex].title, "from album:", response.items[maxpopindex].album.title);
 
         if (response.items && response.items.length > 0 && response.items[0].album) {
-            let title = response.items[maxpopindex].title;
+            // If the track has a version (this is usually alternative editions of the same song), append it to the title.
+            let title = response.items[maxpopindex].version
+                ? response.items[maxpopindex].title + " (" + response.items[maxpopindex].version + ")"
+                : response.items[maxpopindex].title;
+            // If the track has multiple artists, join them with a comma.
             let artist = response.items[maxpopindex].artists.length > 1
                 ? response.items[maxpopindex].artists.map(artist => artist.name).join(", ")
                 : response.items[maxpopindex].artists[0].name;
