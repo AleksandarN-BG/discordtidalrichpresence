@@ -28,7 +28,7 @@ client.on('ready', async () => {
                 albumData = await (getAlbum(song));
                 coverurl = await (getAlbumCover(albumData.coveruuid, albumData.videocoveruuid));
                 if (coverurl !== undefined) {
-                updateRichPresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl);
+                updateRichPresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl, albumData.length);
                 tempsong = song;
                 activityCleared = false;
                 }
@@ -41,9 +41,6 @@ client.on('ready', async () => {
             console.log("Cleared RPC.");
             tempsong = "";
             activityCleared = true;
-        }
-        else {
-            console.log("Not doing anything.");
         }
     }, 5000);
 })

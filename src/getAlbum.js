@@ -21,7 +21,7 @@ export async function getAlbum(query) {
             }
         }
 
-        console.log("Got", response.items[maxpopindex].title, "from album:", response.items[maxpopindex].album.title);
+        console.log("Got", response.items[maxpopindex].title, "from album:", response.items[maxpopindex].album.title, "with a track length of:", response.items[maxpopindex].duration, "seconds.");
 
         if (response.items && response.items.length > 0 && response.items[0].album) {
             // If the track has a version (this is usually alternative editions of the same song), append it to the title.
@@ -36,12 +36,13 @@ export async function getAlbum(query) {
             let songurl = response.items[maxpopindex].url;
             let coveruuid;
             let videocoveruuid;
+            let length = response.items[maxpopindex].duration;
             if (!response.items[maxpopindex].album.videoCover) {
                 coveruuid = response.items[maxpopindex].album.cover;
             } else {
                 videocoveruuid = response.items[maxpopindex].album.videoCover;
             }
-            return{title, artist, album, songurl, coveruuid, videocoveruuid};
+            return{title, artist, album, songurl, coveruuid, videocoveruuid, length};
         } else {
             console.log("No track found, setting RPC to null...");
             client.user.setActivity(null);

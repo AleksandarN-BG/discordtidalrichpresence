@@ -1,5 +1,7 @@
 import edge from "edge-js";
 
+let current = "";
+
 const getWindowTitle = edge.func({
     source: function () {/*
         using System;
@@ -33,16 +35,13 @@ public class Startup
 
 export function fetchWindowTitle(callback) {
     getWindowTitle(null, function (error, result) {
+        current = result;
+
         if (error) throw error;
 
-        if (result === "TIDAL") {
-            console.log("TIDAL is open, but no song is playing.");
-            callback(null);
-        } else if (result === "") {
-            console.log("TIDAL is not open.");
+        if (result === "TIDAL" || result === "") {
             callback(null);
         } else {
-            console.log("Main Window Title: " + result);
             callback(result);
         }
     });
