@@ -2,6 +2,8 @@ import {RichPresence} from "discord.js-selfbot-v13";
 import {client} from "../main.js";
 
 export let rpcdata;
+export let starttime;
+export let endtime;
 
 export function updateRichPresence(song, artist, album, url, cover, length) {
     if (!client.user) {
@@ -15,6 +17,8 @@ export function updateRichPresence(song, artist, album, url, cover, length) {
         return;
     }
 
+    starttime = Date.now();
+    endtime = Date.now() + length * 1000;
     rpcdata = new RichPresence(client)
         .setApplicationId('1265797224454164531')
         .setType('LISTENING')
@@ -24,8 +28,8 @@ export function updateRichPresence(song, artist, album, url, cover, length) {
         .setName('TIDAL')
         .setState(artist)
         .setDetails(song)
-        .setStartTimestamp(Date.now())
-        .setEndTimestamp(Date.now() + length * 1000)
+        .setStartTimestamp(starttime)
+        .setEndTimestamp(endtime)
         .addButton('Listen on TIDAL', url);
     client.user.setActivity(rpcdata);
     console.log('Rich presence updated!');

@@ -1,6 +1,13 @@
 import edge from "edge-js";
+import * as main from "../main.js";
 
 let current = "";
+
+let secondtry;
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const getWindowTitle = edge.func({
     source: function () {/*
@@ -40,8 +47,21 @@ export function fetchWindowTitle(callback) {
         if (error) throw error;
 
         if (result === "TIDAL" || result === "") {
-            callback(null);
+            if (secondtry) {
+                if (!main.activityCleared){console.log("Second try failed.");}
+                callback(null);
+            }
+            else {
+                if (!main.activityCleared){
+                    console.log("TIDAL not found or nothing is playing, retrying before clearing RPC...");
+                    sleep(4000).then(() => {
+                        secondtry = true;
+                        fetchWindowTitle(callback);
+                    });
+                }
+            }
         } else {
+            secondtry = false;
             callback(result);
         }
     });

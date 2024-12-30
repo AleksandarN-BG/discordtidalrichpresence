@@ -30,26 +30,32 @@ export async function getAlbumCover(uuid, videouuid) {
     const imagePath = path.join(__dirname, `${uuid}.jpg`);
 
     if (videouuid) {
+        console.log('Video cover found! Uploading that instead...')
         let parsedvideouuid = videouuid.replace(/-/g, '/');
         const videoCoverUrl = `https://resources.tidal.com/videos/${parsedvideouuid}/1280x1280.mp4`;
         const VideoPath = path.join(__dirname, `${videouuid}.mp4`);
         const GifPath = path.join(__dirname, `${videouuid}.gif`);
 
         try {
-            await axios({
+            const response = await axios({
                 url: videoCoverUrl,
                 responseType: 'stream',
-            })
-                .then(async function (response) {
-                    await response.data.pipe(fs.createWriteStream(VideoPath))
+            });
 
-                    ffmpeg(VideoPath)
-                        .output(GifPath)
-                        .outputOptions('-vf', 'scale=320:-1')
-                        .on('end', async function () {
-                            const attachment = await new MessageAttachment(GifPath);
+            await new Promise((resolve, reject) => {
+                const stream = response.data.pipe(fs.createWriteStream(VideoPath));
+                stream.on('finish', resolve);
+                stream.on('error', reject);
+            });
 
-                            const message = await client.channels.cache.get(channel_id).send({files: [attachment]});
+            await new Promise((resolve, reject) => {
+                ffmpeg(VideoPath)
+                    .output(GifPath)
+                    .outputOptions('-vf', 'scale=320:-1')
+                    .on('end', async function () {
+                        try {
+                            const attachment = new MessageAttachment(GifPath);
+                            const message = await client.channels.cache.get(channel_id).send({ files: [attachment] });
 
                             console.log(`Animated cover uploaded: ${message.attachments.first().url}`);
                             uploadedImages.set(parsedvideouuid, message.attachments.first().url);
@@ -57,14 +63,17 @@ export async function getAlbumCover(uuid, videouuid) {
                             fs.unlinkSync(VideoPath);
                             fs.unlinkSync(GifPath);
 
-                            return message.attachments.first().url;
-                        })
-                        .on('error', function(err) {
-                            console.error('Error creating gif:', err);
-                            throw err;
-                        })
-                        .run();
-                });
+                            resolve(message.attachments.first().url);
+                        } catch (err) {
+                            reject(err);
+                        }
+                    })
+                    .on('error', function (err) {
+                        console.error('Error creating gif:', err);
+                        reject(err);
+                    })
+                    .run();
+            });
         } catch (error) {
             console.error('Error uploading image:', error);
             throw error;
