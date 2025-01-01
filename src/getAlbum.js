@@ -1,15 +1,15 @@
 import {client, country_code} from "../main.js";
+import axios from "axios";
 
 export async function getAlbum(query) {
     let encodedQuery = encodeURIComponent(query);
     let endpoint = `https://api.tidal.com/v1/search/tracks?countryCode=${country_code}&query=${encodedQuery}&limit=10`;
-    const request = await fetch(endpoint, {
-        method: "GET",
+    const request = await axios.get(endpoint, {
         headers: {"x-tidal-token": "CzET4vdadNUFQ5JU"}
     });
 
     try {
-        const response = await request.json();
+        const response = await request.data;
         let maxpop = 0;
         let maxpopindex = 0;
 
@@ -20,6 +20,8 @@ export async function getAlbum(query) {
                 maxpopindex = i;
             }
         }
+
+        console.log(response.items);
 
         console.log("Got", response.items[maxpopindex].title, "from album:", response.items[maxpopindex].album.title, "with a track length of:", response.items[maxpopindex].duration, "seconds.");
 
