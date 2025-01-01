@@ -21,8 +21,6 @@ export async function getAlbum(query) {
             }
         }
 
-        console.log(response.items);
-
         console.log("Got", response.items[maxpopindex].title, "from album:", response.items[maxpopindex].album.title, "with a track length of:", response.items[maxpopindex].duration, "seconds.");
 
         if (response.items && response.items.length > 0 && response.items[0].album) {
