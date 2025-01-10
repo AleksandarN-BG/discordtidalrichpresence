@@ -13,7 +13,7 @@ export const country_code = user_config.country_code;
 let song = "";
 let albumData;
 let coverurl;
-export let activityCleared = true;
+export let activityCleared = false;
 let tempsong = "";
 
 client.login(token).then(()=> console.log("Logged in!"));
