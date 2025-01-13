@@ -54,7 +54,7 @@ export function fetchWindowTitle(callback) {
             else {
                 if (!main.activityCleared){
                     console.log("TIDAL not found or nothing is playing, retrying before clearing RPC...");
-                    sleep(4000).then(() => {
+                    sleep(100).then(() => {
                         secondtry = true;
                         fetchWindowTitle(callback);
                     });

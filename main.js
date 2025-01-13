@@ -1,13 +1,13 @@
-import {Client} from "discord.js-selfbot-v13";
+import {Client} from "@xhayper/discord-rpc";
 import {fetchWindowTitle} from "./src/fetchWindowTitle.js";
 import {getAlbum} from "./src/getAlbum.js";
 import {getAlbumCover} from "./src/getAlbumCover.js";
 import {updateRichPresence, endtime} from "./src/updateRichPresence.js";
 import user_config from './config.json' with {type: "json"};
 
-export const client = new Client();
-export const token = user_config.token;
-export const channel_id = user_config.channel_id;
+export const client = new Client({
+    clientId: "1265797224454164531"
+});
 export const country_code = user_config.country_code;
 
 let song = "";
@@ -16,15 +16,15 @@ let coverurl;
 export let activityCleared = false;
 let tempsong = "";
 
-client.login(token).then(()=> console.log("Logged in!"));
+client.login();
 
-client.on('ready', async () => {
+client.on("ready", async () => {
     console.log(`${client.user.username} is ready!`);
 
     async function checkSong() {
         if (Date.now() > endtime && !activityCleared) {
             console.log("Song ended, clearing RPC...");
-            client.user.setActivity(null);
+            await client.user.clearActivity();
             tempsong = "";
             activityCleared = true;
         }
@@ -41,12 +41,12 @@ client.on('ready', async () => {
                 }
             }
             if (!activityCleared && song === null) {
-                client.user.setActivity(null);
+                await client.user.clearActivity();
                 console.log("Cleared RPC.");
                 tempsong = "";
                 activityCleared = true;
             }
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 10));
             await checkSong();
         });
     }
@@ -55,7 +55,9 @@ client.on('ready', async () => {
 });
 
 process.on('SIGINT', function () {
-    client.user.setActivity(null);
-    console.log("Received exit signal, clearing RPC and exiting...");
-    process.exit();
+    client.user.clearActivity().then(() => {
+        console.log("Received exit signal, clearing RPC and exiting...");
+        process.exit();
+    });
+
 })
