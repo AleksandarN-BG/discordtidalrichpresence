@@ -16,7 +16,13 @@ export async function updateRichPresence(song, artist, album, url, cover, length
         return;
     }
 
-    starttime = Date.now();
+    // keep the start time if the song is the same
+    if (rpcdata && rpcdata.details === song) {
+        starttime = rpcdata.startTimestamp;
+    } else {
+        starttime = Date.now();
+    }
+
     endtime = Date.now() + length * 1000;
     rpcdata = {
         type: 2,
