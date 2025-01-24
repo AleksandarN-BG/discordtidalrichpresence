@@ -23,19 +23,24 @@ export async function updateRichPresence(song, artist, album, url, cover, length
         starttime = Date.now();
     }
 
-    endtime = Date.now() + length * 1000;
-    rpcdata = {
-        type: 2,
-        state: artist,
-        details: song,
-        startTimestamp: starttime,
-        endTimestamp: endtime,
-        largeImageKey: cover,
-        largeImageText: album,
-        smallImageKey: "tidallogo",
-        buttons: [{label: 'Listen on TIDAL', url: url}]
-    };
+    try {
+        endtime = Date.now() + length * 1000;
+        rpcdata = {
+            type: 2,
+            state: artist,
+            details: song,
+            startTimestamp: starttime,
+            endTimestamp: endtime,
+            largeImageKey: cover,
+            largeImageText: album,
+            smallImageKey: "tidallogo",
+            buttons: [{label: 'Listen on TIDAL', url: url}]
+        };
 
-    await client.user.setActivity(rpcdata);
-    console.log('Rich presence updated!');
+        await client.user.setActivity(rpcdata);
+        console.log('Rich presence updated!');
+    } catch (error) {
+        console.error('Error setting activity:', error);
+
+    }
 }
