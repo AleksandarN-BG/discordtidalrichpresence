@@ -5,9 +5,16 @@ import {getAlbumCover} from "./src/getAlbumCover.js";
 import {updateRichPresence, endtime, clearRichPresence} from "./src/updateRichPresence.js";
 import user_config from './config.json' with {type: "json"};
 
-export const client = new Client({
-    clientId: "1265797224454164531"
-});
+export let client;
+try {
+    client = new Client({
+        clientId: "1265797224454164531"
+    });
+} catch (error) {
+    console.error('Error creating client:', error);
+    process.exit(1);
+}
+
 export const country_code = user_config.country_code;
 
 let song = "";
@@ -16,7 +23,16 @@ let coverurl;
 export let activityCleared = false;
 let tempsong = "";
 
-client.login();
+async function loginClient() {
+    try {
+        await client.login();
+    } catch (error) {
+        console.error('Error logging in. Make sure you have Discord running:', error);
+        process.exit(1);
+    }
+}
+
+loginClient();
 
 client.on("ready", async () => {
     console.log(`${client.user.username} is ready!`);
