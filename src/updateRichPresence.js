@@ -3,7 +3,7 @@ import {client} from "../main.js";
 export let rpcdata;
 export let starttime;
 export let endtime;
-
+let elapsedTime = 0;
 let lastsong;
 
 export async function updateRichPresence(song, artist, album, url, cover, length) {
@@ -19,14 +19,16 @@ export async function updateRichPresence(song, artist, album, url, cover, length
     }
 
     // keep the start time if the song is the same
-    if (lastsong && lastsong.details === song && lastsong.state === artist) {
-        starttime = lastsong.startTimestamp;
+    if (lastsong && lastsong.details === song && lastsong.state === artist && elapsedTime < length * 1000) {
+        starttime = Date.now() - elapsedTime;
+        console.log("Resuming...");
     } else {
         starttime = Date.now();
+        elapsedTime = 0;
     }
 
     try {
-        endtime = Date.now() + length * 1000;
+        endtime = starttime + length * 1000;
         rpcdata = {
             type: 2,
             state: artist,
@@ -44,7 +46,6 @@ export async function updateRichPresence(song, artist, album, url, cover, length
         lastsong = rpcdata;
     } catch (error) {
         console.error('Error setting activity:', error);
-
     }
 }
 
@@ -54,6 +55,7 @@ export async function clearRichPresence() {
         return;
     }
     try {
+        elapsedTime = Date.now() - starttime;
         await client.user.clearActivity();
         console.log('Rich presence cleared!');
         rpcdata = null;
