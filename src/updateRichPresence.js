@@ -4,6 +4,8 @@ export let rpcdata;
 export let starttime;
 export let endtime;
 
+let lastsong;
+
 export async function updateRichPresence(song, artist, album, url, cover, length) {
     if (!client.user) {
         console.error('Client user is not ready.');
@@ -17,8 +19,8 @@ export async function updateRichPresence(song, artist, album, url, cover, length
     }
 
     // keep the start time if the song is the same
-    if (rpcdata && rpcdata.details === song) {
-        starttime = rpcdata.startTimestamp;
+    if (lastsong && lastsong.details === song && lastsong.state === artist) {
+        starttime = lastsong.startTimestamp;
     } else {
         starttime = Date.now();
     }
@@ -39,6 +41,7 @@ export async function updateRichPresence(song, artist, album, url, cover, length
 
         await client.user.setActivity(rpcdata);
         console.log('Rich presence updated!');
+        lastsong = rpcdata;
     } catch (error) {
         console.error('Error setting activity:', error);
 
@@ -50,7 +53,6 @@ export async function clearRichPresence() {
         console.error('Client user is not ready.');
         return;
     }
-
     try {
         await client.user.clearActivity();
         console.log('Rich presence cleared!');

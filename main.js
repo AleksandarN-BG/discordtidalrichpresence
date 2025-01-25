@@ -75,5 +75,4 @@ process.on('SIGINT', function () {
         console.log("Received exit signal, clearing RPC and exiting...");
         process.exit();
     });
-
 })
