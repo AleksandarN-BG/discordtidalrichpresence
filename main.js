@@ -2,7 +2,7 @@ import {Client} from "@xhayper/discord-rpc";
 import {fetchWindowTitle} from "./src/fetchWindowTitle.js";
 import {getAlbum} from "./src/getAlbum.js";
 import {getAlbumCover} from "./src/getAlbumCover.js";
-import {updateRichPresence, endtime} from "./src/updateRichPresence.js";
+import {updateRichPresence, endtime, clearRichPresence} from "./src/updateRichPresence.js";
 import user_config from './config.json' with {type: "json"};
 
 export const client = new Client({
@@ -24,9 +24,10 @@ client.on("ready", async () => {
     async function checkSong() {
         if (Date.now() > endtime && !activityCleared) {
             console.log("Song ended, clearing RPC...");
-            await client.user.clearActivity();
+            await clearRichPresence();
             tempsong = "";
             activityCleared = true;
+
         }
         fetchWindowTitle(async (result) => {
             song = result;
@@ -41,8 +42,7 @@ client.on("ready", async () => {
                 }
             }
             if (!activityCleared && song === null) {
-                await client.user.clearActivity();
-                console.log("Cleared RPC.");
+                await clearRichPresence();
                 tempsong = "";
                 activityCleared = true;
             }

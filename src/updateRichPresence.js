@@ -44,3 +44,18 @@ export async function updateRichPresence(song, artist, album, url, cover, length
 
     }
 }
+
+export async function clearRichPresence() {
+    if (!client.user) {
+        console.error('Client user is not ready.');
+        return;
+    }
+
+    try {
+        await client.user.clearActivity();
+        console.log('Rich presence cleared!');
+        rpcdata = null;
+    } catch (error) {
+        console.error('Error clearing activity:', error);
+    }
+}
