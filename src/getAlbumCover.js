@@ -82,3 +82,9 @@ export async function getAlbumCover(uuid, videouuid) {
         return coverUrl;
     }
 }
+
+export async function getArtistPhoto(artistuuid) {
+    let parsedartistphoto = artistuuid.replace(/-/g, '/');
+
+    return `https://resources.tidal.com/images/${parsedartistphoto}/160x160.jpg`;
+}

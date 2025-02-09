@@ -1,3 +1,5 @@
 {
-  "country_code": "RS"
+  "country_code": "RS",
+  "display_versions": false,
+  "display_artist_photo": true
 }

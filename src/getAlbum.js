@@ -1,12 +1,19 @@
-import {client, country_code} from "../main.js";
+import {client, country_code, display_versions} from "../main.js";
 import axios from "axios";
 
 export async function getAlbum(query) {
     let encodedQuery = encodeURIComponent(query);
     let endpoint = `https://api.tidal.com/v1/search/tracks?countryCode=${country_code}&query=${encodedQuery}&limit=10`;
-    const request = await axios.get(endpoint, {
-        headers: {"x-tidal-token": "CzET4vdadNUFQ5JU"}
-    });
+    let request;
+
+    try {
+        request = await axios.get(endpoint, {
+            headers: {"x-tidal-token": "CzET4vdadNUFQ5JU"}
+        });
+    } catch (error) {
+        console.error('Error fetching album, you might be offline. Exiting!');
+        throw error;
+    }
 
     try {
         const response = await request.data;
@@ -25,13 +32,14 @@ export async function getAlbum(query) {
 
         if (response.items && response.items.length > 0 && response.items[0].album) {
             // If the track has a version (this is usually alternative editions of the same song), append it to the title.
-            let title = response.items[maxpopindex].version
+            let title = response.items[maxpopindex].version && display_versions
                 ? response.items[maxpopindex].title + " (" + response.items[maxpopindex].version + ")"
                 : response.items[maxpopindex].title;
             // If the track has multiple artists, join them with a comma.
             let artist = response.items[maxpopindex].artists.length > 1
                 ? response.items[maxpopindex].artists.map(artist => artist.name).join(", ")
                 : response.items[maxpopindex].artists[0].name;
+            let artistphoto = response.items[maxpopindex].artists[0].picture;
             let album = response.items[maxpopindex].album.title;
             let songurl = response.items[maxpopindex].url;
             let coveruuid;
@@ -42,7 +50,7 @@ export async function getAlbum(query) {
             } else {
                 videocoveruuid = response.items[maxpopindex].album.videoCover;
             }
-            return{title, artist, album, songurl, coveruuid, videocoveruuid, length};
+            return{title, artist, artistphoto, album, songurl, coveruuid, videocoveruuid, length};
         } else {
             console.log("No track found, setting RPC to null...");
             client.user.setActivity(null);

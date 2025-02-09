@@ -1,7 +1,7 @@
 import {Client} from "@xhayper/discord-rpc";
 import {fetchWindowTitle} from "./src/fetchWindowTitle.js";
 import {getAlbum} from "./src/getAlbum.js";
-import {getAlbumCover} from "./src/getAlbumCover.js";
+import {getAlbumCover, getArtistPhoto} from "./src/getAlbumCover.js";
 import {updateRichPresence, endtime, clearRichPresence} from "./src/updateRichPresence.js";
 import user_config from './config.json' with {type: "json"};
 
@@ -16,10 +16,13 @@ try {
 }
 
 export const country_code = user_config.country_code;
+export const display_versions = user_config.display_versions;
+export const artist_photos = user_config.display_artist_photo;
 
 let song = "";
 let albumData;
 let coverurl;
+let artistphoto;
 export let activityCleared = false;
 let tempsong = "";
 
@@ -51,8 +54,9 @@ client.on("ready", async () => {
                 console.log("Song changed and/or RPC isn't set! Updating...");
                 albumData = await getAlbum(song);
                 coverurl = await getAlbumCover(albumData.coveruuid, albumData.videocoveruuid);
+                artistphoto = albumData.artistphoto ? await getArtistPhoto(albumData.artistphoto) : null;
                 if (coverurl !== undefined) {
-                    await updateRichPresence(albumData.title, albumData.artist, albumData.album, albumData.songurl, coverurl, albumData.length);
+                    await updateRichPresence(albumData.title, albumData.artist, artistphoto, albumData.album, albumData.songurl, coverurl, albumData.length);
                     tempsong = song;
                     activityCleared = false;
                 }
