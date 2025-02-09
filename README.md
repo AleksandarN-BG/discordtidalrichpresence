@@ -15,7 +15,7 @@ This app was designed with Windows in mind. If you want a similar experience on 
 ```git clone https://github.com/AleksandarN-BG/PublicDiscordTidalRPC.git```
 2. Install the required packages:
 ```npm install```
-3. Put your **two-letter** country code in the `country_code` field.
+3. Put your **two-letter** country code in the `country_code` field, whether you wish to have versions shown (aka what's in the parentheses if you're listening to a different version of the same track) in the `display_versions` field, and if you want the artist's photo to display in the "small image key" (that's that little circular cutout on the bottom right of the album cover on your profile) in `display_artist_photo`.
 
 # Usage
 
