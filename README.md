@@ -3,8 +3,7 @@ This is a simple program that allows you to show what you're listening to on TID
 
 ![animatedcover](https://github.com/user-attachments/assets/c985ec5c-fcf4-45f6-b89e-8f95423a6d76)
 
-<br />
-<img src="mobilescreenshot.png" alt="Screenshot of Discord profile on mobile">
+![image](https://github.com/user-attachments/assets/2b3eb1f3-0ce6-4eea-9a7f-49579e970fa7)
 
 This implementation uses .NET code via the [edge.js](https://www.npmjs.com/package/edge-js) library to scrape the main window title, which it then uses to call the TIDAL API and get basic info about your song, as well as the album cover. <br />
 
