@@ -22,6 +22,10 @@ This app was designed with Windows in mind. If you want a similar experience on 
 1. Run the program:
 ```npm run-script run```
 
+# To-do
+
+- Add handling for the discord client restarting 
+
 # License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
