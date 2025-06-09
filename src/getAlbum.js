@@ -15,6 +15,21 @@ export async function getAlbum(query) {
         throw error;
     }
 
+if (request.data.totalNumberOfItems === 0) {
+    console.log("No tracks found for the query:", query);
+    console.log("I'll try again by cutting the artist name from the query...");
+    // If no tracks are found, try removing the artist name from the query
+    let parts = query.split(" - ");
+    if (parts.length > 1) {
+        let newQuery = parts.slice(1).join(" - ");
+        return getAlbum(newQuery);
+    } else {
+        console.log("No more parts to cut, setting RPC to null...");
+        client.user.setActivity(null);
+        return null;
+    }
+}
+
     try {
         const response = await request.data;
         let maxpop = 0;
@@ -24,6 +39,13 @@ export async function getAlbum(query) {
         for (let i = 0; i < response.items.length; i++) {
             if (response.items[i].popularity > maxpop) {
                 maxpop = response.items[i].popularity;
+                maxpopindex = i;
+            }
+        }
+
+        // After finding the most popular track, we find the oldest instance to avoid compilation albums.
+        for (let i = 0; i < response.items.length; i++) {
+            if (response.items[i].streamStartDate && response.items[i].streamStartDate < response.items[maxpopindex].streamStartDate) {
                 maxpopindex = i;
             }
         }

@@ -7,7 +7,7 @@ let elapsedTime = 0;
 let lastsong;
 
 export async function updateRichPresence(song, artist, artistphoto, album, url, cover, length) {
-    if (!client.user) {
+    if (!client || !client.user) {
         console.error('Client user is not ready.');
         return;
     }
