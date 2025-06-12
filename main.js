@@ -10,6 +10,7 @@ export let client;
 export const country_code = user_config.country_code;
 export const artist_photos = user_config.display_artist_photo;
 export const display_versions = user_config.display_versions;
+export const sort_by = user_config.sort_by;
 
 let song = "";
 let albumData;

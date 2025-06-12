@@ -1,5 +1,7 @@
 {
   "country_code": "RS",
   "display_versions": false,
-  "display_artist_photo": true
+  "display_artist_photo": true,
+  "sort_by": "popularity",
+  "_comment": "Options for sort_by: popularity, releaseDate"
 }

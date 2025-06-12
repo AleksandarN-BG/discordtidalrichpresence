@@ -1,4 +1,4 @@
-import {client, country_code, display_versions} from "../main.js";
+import {client, country_code, display_versions, sort_by} from "../main.js";
 import axios from "axios";
 
 export async function getAlbum(query) {
@@ -36,17 +36,23 @@ if (request.data.totalNumberOfItems === 0) {
         let maxpopindex = 0;
 
         // Find the most popular track. This helps us avoid getting compilations from random live concerts and whatnot.
-        for (let i = 0; i < response.items.length; i++) {
-            if (response.items[i].popularity > maxpop) {
-                maxpop = response.items[i].popularity;
-                maxpopindex = i;
+        // If the sort_by is set to popularity or not set, we find the most popular track.
+        if (sort_by === "popularity" || !sort_by || sort_by !== "releaseDate") {
+            console.log("Sorting by popularity...");
+            for (let i = 0; i < response.items.length; i++) {
+                if (response.items[i].popularity > maxpop) {
+                    maxpop = response.items[i].popularity;
+                    maxpopindex = i;
+                }
             }
         }
-
-        // After finding the most popular track, we find the oldest instance to avoid compilation albums.
-        for (let i = 0; i < response.items.length; i++) {
-            if (response.items[i].streamStartDate && response.items[i].streamStartDate < response.items[maxpopindex].streamStartDate) {
-                maxpopindex = i;
+        else if (sort_by === "releaseDate") {
+            console.log("Sorting by release date...");
+            // After finding the most popular track, we find the oldest instance to avoid compilation albums.
+            for (let i = 0; i < response.items.length; i++) {
+                if (response.items[i].streamStartDate && response.items[i].streamStartDate < response.items[maxpopindex].streamStartDate) {
+                    maxpopindex = i;
+                }
             }
         }
 
