@@ -17,7 +17,7 @@ A modern, real-time Discord Rich Presence client for TIDAL that displays your cu
 - **Accurate position tracking** - Shows exact elapsed/remaining time
 - **Seek detection** - Instantly updates when you skip forward/backward by 2+ seconds
 - **Play/pause synchronization** - RPC updates immediately with playback state changes
-- **Smart timing calculation** - Maintains accuracy even during network interruptions
+- **Smart timing calculation** - Maintains accuracy even during network interruptions or Discord restarts/crashes
 
 ### **Other Cool Stuff**
 - **Animated album covers** - Supports TIDAL's video covers converted to GIFs
