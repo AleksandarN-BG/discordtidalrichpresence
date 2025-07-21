@@ -1,176 +1,201 @@
-// In main.js
-import {Client} from "@xhayper/discord-rpc";
-import {fetchWindowTitle} from "./src/fetchWindowTitle.js";
-import {getAlbum} from "./src/getAlbum.js";
-import {getAlbumCover, getArtistPhoto} from "./src/getAlbumCover.js";
-import {updateRichPresence, endtime, clearRichPresence} from "./src/updateRichPresence.js";
-import user_config from './config.json' with {type: "json"};
+import { DiscordClientManager } from "./src/DiscordClientManager.js";
+import { fetchMediaInfo } from "./src/fetchMediaInfo.js";
+import { getAlbum } from "./src/getAlbum.js";
+import { getAlbumCover, getArtistPhoto } from "./src/getAlbumCover.js";
+import { updateRichPresence, clearRichPresence, setClient } from "./src/updateRichPresence.js";
+import { CONFIG } from "./src/config.js";
 
-export let client;
-export const country_code = user_config.country_code;
-export const artist_photos = user_config.display_artist_photo;
-export const display_versions = user_config.display_versions;
-export const sort_by = user_config.sort_by;
-
-let song = "";
-let albumData;
-let coverurl;
-export let activityCleared = false;
-let tempsong = "";
-let isConnected = false;
-let reconnecting = false;
-let reconnectAttempts = 0;
-let checkSongRunning = false;
-const MAX_RECONNECT_ATTEMPTS = 10;
-const RECONNECT_DELAY = 5000;
-
-function createClient() {
-    try {
-        client = new Client({
-            clientId: "1265797224454164531"
-        });
-
-        // Set up event handlers
-        client.on("ready", onReady);
-
-        client.on("connected", () => {
-            console.log("Connected to Discord RPC");
-            isConnected = true;
-            reconnectAttempts = 0;
-        });
-
-        client.on("disconnected", () => {
-            console.log("Disconnected from Discord RPC");
-            isConnected = false;
-        });
-
-        return true;
-    } catch (error) {
-        console.error('Error creating client:', error);
-        return false;
-    }
-}
-
-async function loginClient() {
-    try {
-        await client.login();
-        return true;
-    } catch (error) {
-        console.error('Error logging in:', error, "Make sure Discord is running.");
-    }
-}
-
-async function attemptReconnect() {
-    if (reconnecting) {
-        return false; // Prevent multiple reconnection attempts
+class TidalRPCApp {
+    constructor() {
+        this.discordManager = new DiscordClientManager();
+        this.currentMediaInfo = null;
+        this.lastMediaInfo = null;
+        this.albumData = null;
+        this.coverurl = null;
+        this.activityCleared = false;
+        this.checkSongRunning = false;
     }
 
-    if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-        console.error("Max reconnection attempts reached, will continue trying");
-        reconnectAttempts = 0; // Reset to allow future attempts
-        reconnecting = false;
+    async initialize() {
+        console.log("Initializing TIDAL Discord RPC...");
+
+        if (this.discordManager.createClient()) {
+            const loginSuccess = await this.discordManager.login();
+
+            if (loginSuccess) {
+                setClient(this.discordManager.client);
+
+                this.discordManager.onReady(() => {
+                    console.log("Discord client ready!");
+                });
+
+                // Start monitoring after login
+                setTimeout(() => {
+                    this.startMonitoring();
+                }, 2000);
+
+                this.setupGracefulShutdown();
+                return true;
+            }
+        }
         return false;
     }
 
-    reconnecting = true;
-    reconnectAttempts++;
-    const delay = RECONNECT_DELAY * Math.pow(1.5, reconnectAttempts - 1);
-
-    console.log(`Attempting to reconnect in ${delay / 1000} seconds (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-
-    return new Promise((resolve) => {
-        setTimeout(async () => {
-            let success = false;
-            try {
-                if (createClient()) {
-                    success = await loginClient() || false;
-                    if (success) {
-                        console.log("Reconnected successfully");
-                        tempsong = null;
-                    }
-                }
-            } catch (error) {
-                console.error("Reconnection attempt failed:", error);
-            } finally {
-                reconnecting = false;
-                resolve(success);
-            }
-        }, delay);
-    });
-}
-
-async function onReady() {
-    console.log(`${client.user.username} is ready!`);
-    checkSong();
-}
-
-async function checkSong() {
-    if (checkSongRunning) {
-        return;
+    async startMonitoring() {
+        this.monitorSongs();
     }
 
-    checkSongRunning = true;
+    async monitorSongs() {
+        if (this.checkSongRunning) return;
 
-    if (!isConnected) {
-        console.log("Discord client disconnected, attempting to reconnect...");
-        const success = await attemptReconnect();
-        if (!success) {
-            // If reconnection failed, try again later but don't start a new loop
-            checkSongRunning = false;
-            setTimeout(checkSong, 1000);
-            return;
+        this.checkSongRunning = true;
+
+        try {
+            // Handle reconnection if needed
+            if (!this.discordManager.isConnected) {
+                const reconnected = await this.discordManager.attemptReconnect();
+                if (!reconnected) {
+                    this.scheduleNextCheck(1000);
+                    return;
+                }
+                setClient(this.discordManager.client);
+            }
+
+            const mediaInfo = await fetchMediaInfo();
+            await this.handleMediaChange(mediaInfo);
+
+        } catch (error) {
+            console.error("Error in monitoring loop:", error);
+        } finally {
+            this.checkSongRunning = false;
+            this.scheduleNextCheck(CONFIG.SONG_CHECK_INTERVAL);
         }
     }
 
-    if (Date.now() > endtime && !activityCleared) {
-        console.log("Song ended, clearing RPC...");
-        await clearRichPresence();
-        tempsong = "";
-        activityCleared = true;
-    }
+    async handleMediaChange(mediaInfo) {
+        this.currentMediaInfo = mediaInfo;
 
-    fetchWindowTitle(async (result) => {
-        song = result;
-        if (song !== null && tempsong !== song) {
-            console.log("Song changed and/or RPC isn't set! Updating...");
-            try {
-                albumData = await getAlbum(song);
-                coverurl = await getAlbumCover(albumData.coveruuid, albumData.videocoveruuid);
-                let artistphoto = albumData.artistphoto ? await getArtistPhoto(albumData.artistphoto) : null;
-                if (coverurl !== undefined) {
-                    await updateRichPresence(albumData.title, albumData.artist, albumData.artistid, artistphoto, albumData.album, albumData.albumid, albumData.songurl, coverurl, albumData.length);
-                    tempsong = song;
-                    activityCleared = false;
-                }
-            } catch (error) {
-                console.error("Error updating rich presence:", error);
+        // Check if song has changed
+        const songChanged = this.hasSongChanged(this.lastMediaInfo, this.currentMediaInfo);
+
+        // Check if user has seeked within the same song
+        const hasSeekOccurred = this.hasSeekOccurred(this.lastMediaInfo, this.currentMediaInfo);
+
+        if (this.currentMediaInfo && (songChanged || hasSeekOccurred)) {
+            if (songChanged) {
+                console.log(`Song changed! Now playing: ${this.currentMediaInfo.artist} - ${this.currentMediaInfo.title}`);
+            } else if (hasSeekOccurred) {
+                console.log(`Seek detected! Position changed to: ${this.currentMediaInfo.position}s`);
             }
+            await this.updateRichPresenceData();
         }
 
-        if (!activityCleared && song === null) {
+        if (!this.activityCleared && this.currentMediaInfo === null) {
             await clearRichPresence();
-            tempsong = "";
-            activityCleared = true;
+            this.lastMediaInfo = null;
+            this.activityCleared = true;
         }
-
-        await new Promise(resolve => setTimeout(resolve, 10));
-        checkSongRunning = false;
-        checkSong();
-    });
-}
-
-// Start the app
-if (createClient()) {
-    loginClient();
-}
-
-process.on('SIGINT', function() {
-    if (client && client.user) {
-        client.user.clearActivity().then(() => {
-            console.log("Received exit signal, clearing RPC and exiting...");
-            process.exit();
-        }).catch(() => {});
-    } else {
-        process.exit();
     }
+
+    hasSongChanged(lastInfo, currentInfo) {
+        if (!lastInfo && currentInfo) return true;
+        if (lastInfo && !currentInfo) return true;
+        if (!lastInfo && !currentInfo) return false;
+
+        return lastInfo.title !== currentInfo.title ||
+               lastInfo.artist !== currentInfo.artist;
+    }
+
+    hasSeekOccurred(lastInfo, currentInfo) {
+        // Only check for seeks if we have both last and current info for the same song
+        if (!lastInfo || !currentInfo) return false;
+        if (lastInfo.title !== currentInfo.title || lastInfo.artist !== currentInfo.artist) return false;
+
+        // Check if the lastSeekTime flag indicates a recent seek occurred
+        return !!(currentInfo.lastSeekTime && (!lastInfo.lastSeekTime || currentInfo.lastSeekTime > lastInfo.lastSeekTime));
+
+
+    }
+
+    async updateRichPresenceData() {
+        try {
+            this.albumData = await getAlbum(this.currentMediaInfo.query);
+
+            if (!this.albumData) {
+                return;
+            }
+
+            this.coverurl = await getAlbumCover(
+                this.albumData.coveruuid,
+                this.albumData.videocoveruuid
+            );
+
+            const artistPhoto = this.albumData.artistphoto
+                ? await getArtistPhoto(this.albumData.artistphoto)
+                : null;
+
+            if (this.coverurl !== undefined) {
+                // Use the duration from media info if available, fallback to album data
+                const duration = this.currentMediaInfo.duration || this.albumData.length;
+
+                await updateRichPresence(
+                    this.albumData.title,
+                    this.albumData.artist,
+                    this.albumData.artistid,
+                    artistPhoto,
+                    this.albumData.album,
+                    this.albumData.albumid,
+                    this.albumData.songurl,
+                    this.coverurl,
+                    duration,
+                    this.currentMediaInfo.position, // Pass the current position for accurate seeking
+                    this.currentMediaInfo // Pass the full mediaInfo object for seek detection
+                );
+
+                this.lastMediaInfo = this.currentMediaInfo;
+                this.activityCleared = false;
+            }
+        } catch (error) {
+            console.error("Error updating rich presence:", error);
+        }
+    }
+
+    scheduleNextCheck(delay = CONFIG.SONG_CHECK_INTERVAL) {
+        setTimeout(() => {
+            this.monitorSongs();
+        }, delay);
+    }
+
+    setupGracefulShutdown() {
+        process.on('SIGINT', async () => {
+            try {
+                if (this.discordManager.client?.user) {
+                    await this.discordManager.clearActivity();
+                }
+                console.log("Received exit signal, clearing RPC and exiting...");
+            } catch (error) {
+                console.warn("Error during shutdown:", error);
+            } finally {
+                process.exit();
+            }
+        });
+    }
+}
+
+// Start the application
+const app = new TidalRPCApp();
+
+app.initialize().then(success => {
+    if (!success) {
+        console.error("Failed to initialize application");
+        process.exit(1);
+    } else {
+        console.log("TIDAL Discord RPC initialized successfully!");
+    }
+}).catch(error => {
+    console.error("Application startup error:", error);
+    process.exit(1);
 });
+
+// Export for backward compatibility (if needed by other modules)
+export const client = app.discordManager?.client;
