@@ -6,7 +6,7 @@ export let endtime;
 let elapsedTime = 0;
 let lastsong;
 
-export async function updateRichPresence(song, artist, artistphoto, album, url, cover, length) {
+export async function updateRichPresence(song, artist, artistid, artistphoto, album, albumid, url, cover, length) {
     if (!client || !client.user) {
         console.error('Client user is not ready.');
         return;
@@ -33,12 +33,17 @@ export async function updateRichPresence(song, artist, artistphoto, album, url, 
             type: 2, // Listening
             state: artist,
             details: song,
+            detailsUrl: url, // Makes song title clickable
+            stateUrl: 'https://tidal.com/artist/' + artistid,   // Makes artist name clickable
             startTimestamp: starttime,
             endTimestamp: endtime,
             largeImageKey: cover,
             largeImageText: album,
+            largeImageUrl: 'https://tidal.com/album/' + albumid,
             smallImageKey: artist_photos && artistphoto ? artistphoto : 'tidallogo',
-            smallImageText: artist_photos && artistphoto ? artist : 'TIDAL',
+            smallImageText: artist_photos && artistphoto ? artist : 'TIDAL - ' + artist,
+            smallImageUrl: 'https://tidal.com/artist/' + artistid,
+            statusDisplayType: 1, // 0 = activity name, 1 = state (artist), 2 = details (song)
             buttons: [{label: 'Listen on TIDAL', url: url}]
         };
 

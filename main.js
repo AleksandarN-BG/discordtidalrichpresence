@@ -138,7 +138,7 @@ async function checkSong() {
                 coverurl = await getAlbumCover(albumData.coveruuid, albumData.videocoveruuid);
                 let artistphoto = albumData.artistphoto ? await getArtistPhoto(albumData.artistphoto) : null;
                 if (coverurl !== undefined) {
-                    await updateRichPresence(albumData.title, albumData.artist, artistphoto, albumData.album, albumData.songurl, coverurl, albumData.length);
+                    await updateRichPresence(albumData.title, albumData.artist, albumData.artistid, artistphoto, albumData.album, albumData.albumid, albumData.songurl, coverurl, albumData.length);
                     tempsong = song;
                     activityCleared = false;
                 }

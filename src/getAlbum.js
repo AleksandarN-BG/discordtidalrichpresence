@@ -67,8 +67,10 @@ if (request.data.totalNumberOfItems === 0) {
             let artist = response.items[maxpopindex].artists.length > 1
                 ? response.items[maxpopindex].artists.map(artist => artist.name).join(", ")
                 : response.items[maxpopindex].artists[0].name;
+            let artistid = response.items[maxpopindex].artists[0].id;
             let artistphoto = response.items[maxpopindex].artists[0].picture;
             let album = response.items[maxpopindex].album.title;
+            let albumid = response.items[maxpopindex].album.id;
             let songurl = response.items[maxpopindex].url;
             let coveruuid;
             let videocoveruuid;
@@ -78,7 +80,7 @@ if (request.data.totalNumberOfItems === 0) {
             } else {
                 videocoveruuid = response.items[maxpopindex].album.videoCover;
             }
-            return{title, artist, artistphoto, album, songurl, coveruuid, videocoveruuid, length};
+            return{title, artist, artistid, artistphoto, album, albumid, songurl, coveruuid, videocoveruuid, length};
         } else {
             console.log("No track found, setting RPC to null...");
             client.user.setActivity(null);
