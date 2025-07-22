@@ -147,5 +147,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [@innei/winplayer-rs](https://www.npmjs.com/package/@innei/winplayer-rs) - For excellent Windows Media Session integration
 - [FFmpeg](https://ffmpeg.org/) - For media processing
 - [uguu.se](https://uguu.se/) - For image hosting
-
+- [discordtidal by unickorn](https://github.com/unickorn/discordtidal) - For the inspiration!
 
